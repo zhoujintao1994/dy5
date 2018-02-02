@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.dayuan.mapper.BankCardMapper2">
+
+
+	<resultMap type="bankCard" id="bankCardMap">
+		<id property="id" column="id" />
+		<result property="cardNumber" column="card_number" />
+		<result property="sum" column="sum" />
+		<result property="passWord" column="password" />
+		<result property="version" column="version" />
+		<result property="grearTime" column="grear_time" />
+		<result property="mtime" column="mtime" />
+		<result property="userId" column="user_id" />
+	</resultMap>
+
+	<sql id="bankCard_filed">
+		id,card_number, sum, password, version, grear_time, mtime, user_id
+	</sql>
+
+	<select id="getBankCard" resultMap="bankCardMap">
+		select
+		<include refid="bankCard_filed"></include>
+		from bank_card
+		where card_number = #{cardNumber}
+	</select>
+
+	<insert id="addCard" useGeneratedKeys="true" keyProperty="id">
+		INSERT into bank_card(card_number, sum, password, version, grear_time,
+		mtime,user_id)
+		value(#{cardNumber}, #{sum}, #{passWord},#{version}, now(), now(),#{userId})
+	</insert>
+
+	<update id="modifyBalance">
+		UPDATE bank_card set sum = #{sum}, version = version + 1, mtime=now()
+		where card_number= #{cardNumber} and version = #{version};
+	</update>
+
+	<select id="listBankCard" resultMap="bankCardMap">
+		select id,card_number, sum, password, version, grear_time, mtime,
+		user_id from bank_card
+		where user_id=#{userId} order by id desc
+		<if test="offset != null">
+			limit #{offset}, #{prePage}
+		</if>
+
+	</select>
+
+	<select id="countBankCard" resultType="int">
+		select count(*)
+		from bank_card
+		where user_id=#{userId};
+	</select>
+
+	<delete id="deleteCard">
+		delete from bank_card where id=#{cardId}
+	</delete>
+
+</mapper>

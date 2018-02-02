@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.dayuan.mapper.FlowMapper">
+	<resultMap type="flow" id="flowMapper">
+		<id property="id" column="id" />
+		<result property="cardNum" column="card_num" />
+		<result property="amount" column="amount" />
+		<result property="flowType" column="flow_type" />
+		<result property="descript" column="descript" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+	<sql id="flow_filed">
+		id, card_num, amount, flow_type, descript, create_time
+	</sql>
+
+	<insert id="addFlow" useGeneratedKeys="true" keyProperty="id">
+		INSERT into flow (card_num, amount, flow_type, descript, create_time)
+		value(#{cardNum}, #{amount}, #{flowType}, #{descript}, now());
+	</insert>
+
+	<select id="listFlow" resultMap="flowMapper">
+		select
+		<include refid="flow_filed"></include>
+		from flow
+		where card_num = #{cardNumber} limit #{offset}, #{prePage};
+	</select>
+	
+	<select id="countFlow" resultType="int">
+		select count(*) from flow where card_num=#{cardNumber};
+	</select>
+	
+	<select id="listFlowByUseId" resultMap="flowMapper">
+		SELECT * from bank_card INNER JOIN  flow ON bank_card.card_number =  flow.card_num WHERE bank_card.user_id =#{userId} 
+		ORDER BY flow.create_time DESC 
+		LIMIT #{prePage};
+	</select>
+</mapper>

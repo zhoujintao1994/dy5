@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+		
+	
+	<context:component-scan base-package="com.dayuan"/>
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	    <property name="locations" value="classpath:jdbc.properties"/>
+	</bean>
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="driverClassName" value="${jdbc.driver}" />
+	</bean>
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>
+	</bean>
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.dayuan.mapper"/>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="txManager"/><!--平台事务管理器 a PlatformTransactionManager is still required -->
+    
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/> <!-- 数据源 -->
+    </bean>
+    
+     <bean id="jedispool" class="redis.clients.jedis.JedisPoolConfig"><!-- 连接池 -->
+    	<property name="maxIdle" value="300"/> <!-- 最大空闲数 -->
+    	<property name="maxWaitMillis" value="600"/><!-- 最大等待数 -->
+    	<property name="maxTotal" value="5000"/><!-- 最大总数 -->
+    </bean>
+    			
+    <bean id="jedisConnFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+    	<property name="poolConfig" ref="jedispool"/><!-- 连接池关联 -->
+    	<property name="hostName" value="192.168.8.184"/> <!-- 主机ip地址 -->
+    </bean>
+    
+    <!-- 解析字符串序列化 -->
+    <bean id="stringSerial" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+    	<property name="connectionFactory" ref="jedisConnFactory"/> <!-- 连接工厂 （关联连接池和ip地址） -->
+    	<property name="keySerializer" ref="stringSerial"/>
+    </bean>
+  
+</beans> 

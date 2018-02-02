@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dayuan.mapper.TransferMapper">
+	<resultMap type="transfer" id="transferMapper">
+		<id property="id" column="id" />
+		<result property="tfBlance" column="tf_balance" />
+		<result property="tfBankcard" column="tf_bankcard" />
+		<result property="cfBankcard" column="cf_bankcard" />
+		<result property="createTime" column="create_time" />
+		<result property="modifyTime" column="modify_time" />
+		<result property="status" column="status" />
+	</resultMap>
+
+	<sql id="transfer_filed">
+		tf_balance, tf_bankcard, cf_bankcard, create_time,
+		modify_time ,id
+	</sql>
+	
+	<insert id="addTransf" useGeneratedKeys="true" keyProperty="id">
+		INSERT into not_transfer(tf_balance, tf_bankcard,
+		cf_bankcard,create_time, modify_time, status, id)
+		value(#{tfBlance},
+		#{tfBankcard}, #{cfBankcard}, now(), now(), #{status}, #{id})
+	</insert>
+
+	<select id="selectTransf" resultMap="transferMapper">
+		SELECT tf_balance,
+		tf_bankcard, cf_bankcard, create_time, modify_time ,id from
+		not_transfer
+		WHERE id = #{id}
+	</select>
+
+	<update id="modifyStatus">
+		update not_transfer set status=#{newStatus},
+		modify_time = now()
+		where id = #{id}
+	</update>
+
+	<select id="list4TransferIn" resultMap="transferMapper">
+		select tf_balance,
+		tf_bankcard, cf_bankcard, create_time, modify_time, id from
+		not_transfer WHERE status = #{status} AND create_time &lt; #{deadTime}
+	</select>
+
+	<select id="selectStatus" resultMap="transferMapper">
+		SELECT <include refid="transfer_filed"></include>FROM not_transfer
+		WHERE status = #{status}
+	</select>
+</mapper>

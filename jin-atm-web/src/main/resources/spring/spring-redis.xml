@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+        
+          <bean id="jedispool" class="redis.clients.jedis.JedisPoolConfig">
+    	<property name="maxIdle" value="6"/><!-- 最大空闲数 -->
+    	<property name="maxWaitMillis" value="600"/><!-- 最大等待数 -->
+    	<property name="maxTotal" value="300"/><!-- 最大总数 -->
+    </bean>
+    
+    <bean id="jedisConnFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+    	<property name="poolConfig" ref="jedispool"/><!-- 连接池关联 -->
+    	<property name="hostName" value="192.168.8.184"/><!-- 主机ip地址 -->
+    	<property name="timeout" value="8000"/>
+    </bean>
+    
+    <!-- 解析字符串序列化 -->
+    <bean id="stringSerial" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+    	<property name="connectionFactory" ref="jedisConnFactory"/><!-- 连接工厂 （关联连接池和ip地址） -->
+    	<property name="keySerializer" ref="stringSerial"/>
+    </bean>
+	
+</beans>

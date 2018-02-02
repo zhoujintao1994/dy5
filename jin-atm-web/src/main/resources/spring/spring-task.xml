@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+        
+
+	<!--<bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	    <property name="targetObject" ref="serviceimpl"/>
+	    <property name="targetMethod" value="doTask"/>
+	    <property name="concurrent" value="false"/> 
+	</bean>  第一种方法    -->
+	
+	    <bean id="transfer" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	    <property name="targetObject" ref="transferProcessTask"/>
+	    <property name="targetMethod" value="doTask"/>
+	    <property name="concurrent" value="false"/>
+	 </bean> <!--第二种方法-->
+	 
+	  <bean id="transfer1" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	    <property name="targetObject" ref="transferCancelTask"/>
+	    <property name="targetMethod" value="doTask"/>
+	    <property name="concurrent" value="false"/>
+	 </bean> <!--第二种方法-->
+	
+	<!-- <bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+	    <property name="jobDetail" ref="jobDetail"/>
+	    <property name="startDelay" value="10000"/>
+	    <property name="repeatInterval" value="3000"/>
+	</bean> 第一种方法   -->
+	
+	 <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+	    <property name="jobDetail" ref="transfer"/>
+	    <property name="cronExpression" value="0/5 * * * * ?"/>
+	</bean> <!--第二种方法-->
+	
+	 <bean id="cronTrigger1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+	    <property name="jobDetail" ref="transfer1"/>
+	    <property name="cronExpression" value="0/10 * * * * ?"/>
+	</bean> <!--第二种方法-->
+	
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	    <property name="triggers"> <!--  -->
+	        <list>
+	            <ref bean="cronTrigger"/> 
+	            <ref bean="cronTrigger1"/>
+	        </list>
+	    </property>
+	</bean>
+	
+</beans>

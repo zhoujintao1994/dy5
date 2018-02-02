@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.dayuan.mapper.UserMapper">
+
+  <resultMap type="user" id="userReturnMapper">
+  	<id property="id" column="id" />
+  	<result property="username" column="username" />
+  	<result property="passWord" column="password" />
+  	<result property="createTime" column="create_time" />
+  </resultMap>
+  
+  <sql id="user_filed">
+  	id, username, password, create_time
+  </sql>
+
+  <insert id="addUser" useGeneratedKeys="true" keyProperty="id">
+  	INSERT into atm_user(username, password, create_time) 
+  	value(#{username}, #{password}, now());
+  </insert>
+  
+  <select id="getUser" resultMap="userReturnMapper">
+  	select <include refid="user_filed"></include> 
+  	from atm_user 
+  	where username=#{username};
+  </select>
+  
+  <update id="modifyPwd">
+  	UPDATE atm_user set password = #{password}, create_time =now() 
+  	where username = #{username};
+  </update>
+  
+   <select id="getUserById" resultMap="userReturnMapper">
+  	select <include refid="user_filed"></include> 
+  	from atm_user 
+  	where id=#{userId};
+	</select>
+	
+</mapper>
